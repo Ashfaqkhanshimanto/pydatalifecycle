@@ -64,3 +64,13 @@ tourism_df = fetch_tourism_data()
 weather_df['month'] = pd.to_datetime(weather_df['date']).dt.to_period('M').dt.to_timestamp()
 combined_df = pd.merge(weather_df, tourism_df, on='month', how='left')
 
+
+def store_data_sqlite(df, db_name='weather_tourism.db'):
+    """
+    Stores the DataFrame into an SQLite database.
+    """
+    engine = create_engine(f'sqlite:///{db_name}')
+    df.to_sql('weather_tourism', con=engine, if_exists='replace', index=False)
+    return engine
+
+engine = store_data_sqlite(combined_df)
