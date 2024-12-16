@@ -39,3 +39,29 @@ weather_df = fetch_weather_data(
     start_date='2023-01-01',
     end_date='2023-12-31'
 )
+
+
+def fetch_tourism_data():
+    """
+    Fetches tourism data. For demonstration, we use a sample dataset.
+    In a real scenario, replace this with an actual data source.
+    """
+    # Sample tourism data: number of tourists per month in Dubai
+    tourism_data = {
+        'month': ['2023-01', '2023-02', '2023-03', '2023-04', '2023-05',
+                  '2023-06', '2023-07', '2023-08', '2023-09', '2023-10',
+                  '2023-11', '2023-12'],
+        'tourists': [500000, 450000, 600000, 700000, 800000,
+                     750000, 720000, 680000, 700000, 800000,
+                     850000, 900000]
+    }
+    tourism_df = pd.DataFrame(tourism_data)
+    tourism_df['month'] = pd.to_datetime(tourism_df['month'])
+    return tourism_df
+
+tourism_df = fetch_tourism_data()
+
+# Merge weather data with tourism data based on month
+weather_df['month'] = pd.to_datetime(weather_df['date']).dt.to_period('M').dt.to_timestamp()
+combined_df = pd.merge(weather_df, tourism_df, on='month', how='left')
+
