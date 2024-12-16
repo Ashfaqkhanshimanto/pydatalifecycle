@@ -132,3 +132,32 @@ def create_dash_app(engine):
         [Input('temp_type', 'value'),
          Input('month_range', 'value')]
     )
+
+    def update_graphs(temp_type, month_range):
+        # Filter data based on month range
+        start_month, end_month = month_range
+        filtered_df = df[df['month'].dt.month.between(start_month, end_month)]
+        
+        # Temperature Line Chart
+        temp_fig = px.line(
+            filtered_df,
+            x='date',
+            y=temp_type,
+            title=f"Daily {'Max' if temp_type == 'temp_max' else 'Min'} Temperature in Dubai (2023)",
+            labels={'date': 'Date', temp_type: 'Temperature (°C)'}
+        )
+        temp_fig.update_layout(xaxis_title='Date', yaxis_title='Temperature (°C)')
+        
+        # Tourism Bar Chart
+        tourism_fig = px.bar(
+            filtered_df.groupby('month')['tourists'].mean().reset_index(),
+            x='month',
+            y='tourists',
+            title="Average Monthly Tourists in Dubai (2023)",
+            labels={'month': 'Month', 'tourists': 'Number of Tourists'}
+        )
+        tourism_fig.update_layout(xaxis_title='Month', yaxis_title='Number of Tourists')
+        
+        return temp_fig, tourism_fig
+    
+    return app
