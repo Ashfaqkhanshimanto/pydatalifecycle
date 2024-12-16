@@ -44,7 +44,6 @@ weather_df = fetch_weather_data(
 def fetch_tourism_data():
     """
     Fetches tourism data. For demonstration, we use a sample dataset.
-    In a real scenario, replace this with an actual data source.
     """
     # Sample tourism data: number of tourists per month in Dubai
     tourism_data = {
