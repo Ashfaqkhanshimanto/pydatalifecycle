@@ -161,3 +161,10 @@ def create_dash_app(engine):
         return temp_fig, tourism_fig
     
     return app
+
+
+
+if __name__ == '__main__':
+    app = create_dash_app(engine)
+    app.run_server(debug=True)
+
