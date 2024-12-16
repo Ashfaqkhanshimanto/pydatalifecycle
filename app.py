@@ -74,3 +74,61 @@ def store_data_sqlite(df, db_name='weather_tourism.db'):
     return engine
 
 engine = store_data_sqlite(combined_df)
+
+
+def create_dash_app(engine):
+    """
+    Creates and runs a Dash application to visualize the data.
+    """
+    # Initialize Dash app
+    app = Dash(__name__)
+    
+    # Fetch data from SQLite
+    query = "SELECT * FROM weather_tourism"
+    df = pd.read_sql(query, engine)
+    
+    # Convert 'month' to datetime if not already
+    if not pd.api.types.is_datetime64_any_dtype(df['month']):
+        df['month'] = pd.to_datetime(df['month'])
+    
+    # Layout of the Dash app
+    app.layout = html.Div([
+        html.H1("Dubai Weather and Tourism Data (2023)"),
+        
+        html.Div([
+            html.Label("Select Temperature Type:"),
+            dcc.Dropdown(
+                id='temp_type',
+                options=[
+                    {'label': 'Max Temperature', 'value': 'temp_max'},
+                    {'label': 'Min Temperature', 'value': 'temp_min'}
+                ],
+                value='temp_max'
+            )
+        ], style={'width': '48%', 'display': 'inline-block', 'padding': '0 20'}),
+        
+        html.Div([
+            html.Label("Select Month Range:"),
+            dcc.RangeSlider(
+                id='month_range',
+                min=1,
+                max=12,
+                value=[1, 12],
+                marks={i: pd.to_datetime(f'2023-{i:02d}-01').strftime('%b') for i in range(1,13)},
+                step=1,
+                allowCross=False
+            )
+        ], style={'width': '98%', 'padding': '20px 20px 20px 20px'}),
+        
+        dcc.Graph(id='temperature_graph'),
+        
+        dcc.Graph(id='tourism_graph')
+    ])
+    
+    # Callback to update graphs based on user input
+    @app.callback(
+        [Output('temperature_graph', 'figure'),
+         Output('tourism_graph', 'figure')],
+        [Input('temp_type', 'value'),
+         Input('month_range', 'value')]
+    )
